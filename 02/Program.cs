@@ -1,20 +1,13 @@
-﻿
-using System.Formats.Asn1;
+﻿using utils;
 
-var input = parse("input.txt");
+var input = parse(args.FirstOrDefault() ?? "input.txt");
 
 Console.WriteLine($"Part01: {Part01(input)}");
 Console.WriteLine($"Part02: {Part02(input)}");
 
-int Part01(List<Report> input)
-{
-    return input.Count(r => r.IsSafe());
-}
+int Part01(List<Report> input) => input.Count(r => r.IsSafe());
 
-int Part02(List<Report> input)
-{
-    return input.Count(r => r.IsSafe(true));
-}
+int Part02(List<Report> input) => input.Count(r => r.IsSafe(true));
 
 List<Report> parse(string fileName)
 {
@@ -24,72 +17,21 @@ List<Report> parse(string fileName)
         .ToList();
 }
 
-enum Direction { Inc, Equal, Dec }
-
 record Report(List<long> levels)
 {
-    
-    public bool IsSafe(bool withRemoval = false)
-    {
-        List<int> numInc = [];
-        List<int> numEqual = [];
-        List<int> numDec = [];
-        for(int i = 0; i < levels.Count - 1; i++)
-        {
-            var diff = levels[i+1] - levels[i];
-            if(diff > 0)
+    public bool IsSafe(bool withRemoval = false) =>
+        levels.Zip(levels.Skip(1))
+            .Select(x => x.First - x.Second)
+            .Where(x => Math.Abs(x) >= 1 && Math.Abs(x) <= 3)
+            .GroupBy(x => x > 0)
+            .Let(nums =>
             {
-                numInc.Add(i);
-            }
-            else if(diff == 0)
-            {
-                numEqual.Add(i);
-            }
-            else if(diff < 0)
-            {
-                numDec.Add(i);
-            }
-        }
-
-        var nums = new List<int>[] { numInc, numEqual, numDec }.Where(l => l.Count >= 1).ToList();
-        if(nums.Count >= 2)
-        {
-            if(withRemoval)
-            {
-                for(int i = 0; i < levels.Count; i++)
+                if(nums.Sum(g => g.Count()) != levels.Count - 1 || nums.Count() > 1)
                 {
-                    var newLevels = new List<long>(levels);
-                    newLevels.RemoveAt(i);
-                    if(new Report(newLevels).IsSafe(false   ))
-                    {
-                        return true;
-                    }
+                    return !withRemoval ? false : Enumerable.Range(0, levels.Count)
+                        .Any(i => new Report(levels.ToList().Also(l => l.RemoveAt(i)).ToList()).IsSafe(false));
                 }
-            }
-            return false;
-        }
-
-        for(int i = 0; i < levels.Count - 1; i++)
-        {
-            var diff = Math.Abs(levels[i+1] - levels[i]);
-            if(!(diff >= 1 && diff <= 3))
-            {   
-                if(withRemoval)
-                {
-                    for(int j = 0; j < levels.Count; j++)
-                    {
-                        var newLevels = new List<long>(levels);
-                        newLevels.RemoveAt(j);
-                        if(new Report(newLevels).IsSafe(false   ))
-                        {
-                            return true;
-                        }
-                    }
-                }
-                return false;
-            }
-        }
-
-        return true;
-    }
+                return true;
+            });
+       
 }
