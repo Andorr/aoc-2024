@@ -20,6 +20,7 @@ kotlin:
 	cp -R kotlin $(DAY)
 	mv $(DAY)/tmp.iml $(DAY)/aoc$(DAY).iml
 	sed -i "s/tmp/aoc$(DAY)/g" ./$(DAY)/.idea/modules.xml
+	sed -i "s/tmp/aoc$(DAY)/g" ./$(DAY)/.idea/workspace.xml
 	curl --cookie session=$(TOKEN) https://adventofcode.com/$(YEAR)/day/$(DAY_SHORT)/input > $(DAY)/input.txt
 
 .PHONY: token
