@@ -3,8 +3,8 @@ import java.io.File
 fun main() {
     val input = parse("input.txt")
 
-    println("Part01 ${part01(input)}")
-    println("Part02 ${part02(input)}")
+    println("Part01: ${part01(input)}")
+    println("Part02: ${part02(input)}")
 }
 
 fun part01(input: List<Calibration>): Long = input.calibrate(Operator.Add, Operator.Mul)
@@ -48,6 +48,10 @@ data class Calibration(val testValue: Long, val numbers: List<Long>)
             if(state.value == testValue && state.i == numbers.size-1)
             {
                 return true
+            }
+            else if(state.value > testValue)
+            {
+                continue;
             }
 
             if(state.i < numbers.size-1)
