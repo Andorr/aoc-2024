@@ -51,28 +51,25 @@ fun part02(arg: Input): Long {
 
     var curPos = input.start
     input.path.forEach { step ->
-        // printMap(input.map, curPos)
         val dir = directions[step]!!
 
         val boxes = mutableListOf<Pair<Coord, Coord>>()
-        var nextSteps = mutableListOf(
-            curPos + dir
-        )
+        var nextSteps = mutableListOf(curPos + dir)
         while (nextSteps.any { nextStep -> input.map[nextStep.y][nextStep.x].let { "[]".contains(it)}} &&
             nextSteps.all { nextStep -> input.map[nextStep.y][nextStep.x] != '#' })
         {
             if(dir.x != 0) {
                 boxes.add(nextSteps.first().let { Pair(it, it + dir) })
-                nextSteps = mutableListOf(nextSteps.first().let { Coord(it.x + dir.x*2, it.y) })
+                nextSteps = mutableListOf(nextSteps.first() + dir*2)
             } else {
-                val newBoxes = nextSteps.filter {
-                    input.map[it.y][it.x].let { "[]".contains(it)}
+                val newBoxes = nextSteps.filter { coord ->
+                    input.map[coord.y][coord.x].let { "[]".contains(it)}
                 }
                 .map { step ->
                     when(input.map[step.y][step.x]) {
                         '[' -> Pair(step, step + Coord(1, 0))
                         ']' -> Pair(step, step + Coord(-1, 0))
-                        else -> Pair(step, step) // Not possible
+                        else -> null!! // Not possible
                     }
                 }
                 boxes.addAll(newBoxes)
@@ -91,7 +88,6 @@ fun part02(arg: Input): Long {
                 input.map[it.second.y][it.second.x] = '.'
             }
             if(dir.x != 0) {
-
                 boxes.map {
                     Pair(it.first + dir, it.second + dir)
                 }.forEach {
@@ -110,7 +106,6 @@ fun part02(arg: Input): Long {
 
         curPos += dir
     }
-    // printMap(input.map, curPos)
 
     return input.map.mapIndexed { y, chars ->
         chars.mapIndexed { x, c ->
