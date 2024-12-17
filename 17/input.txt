@@ -1,0 +1,21 @@
+Register A: 66245665
+Register B: 0
+Register C: 0
+
+Program: 2,4,1,7,7,5,1,7,4,6,0,3,5,5,3,0
+
+
+b = a%8
+b = b ^ 7
+c = a >> 5
+b = b ^ 7
+b = b ^ c
+a = a >> 3
+output b
+jmp 0
+
+
+0 = (a % 8 ^ 7 ^ 7) ^ (a >> 5)
+0 = (a % 8) ^ (a >> 5)
+
+0 xor (a >> 5) = (a % 8 xor 7 xor 7)
